@@ -1,42 +1,51 @@
 'use strict';
 
-userApp.controller('UserDetailCtrl', function($scope, $routeParams, UsersService) {
+userApp.component('userDetail', {
 
-    $scope.userLoaded = false;
+  bindings: {
+    id: '<'
+  },
 
-    $scope.user = UsersService.get({
-        userId: $routeParams['userId']
+  controller: function UserDetailCtrl($routeParams, UsersService) {
+
+    this.userLoaded = false;
+
+    this.user = UsersService.get({
+      userId: this.id
     }, function(successResult) {
-        // Окей!
-        $scope.notfoundError = false;
-        $scope.userLoaded = true;
+      // Окей!
+      this.notfoundError = false;
+      this.userLoaded = true;
 
-        $scope.activeTab = 1;
-        $scope.disableControlTab = true;
+      this.activeTab = 1;
+      this.disableControlTab = true;
     }, function(errorResult) {
+      // Не окей..
+      this.notfoundError = true;
+      this.userLoaded = true;
+
+    });
+
+    this.user.$promise.then(function(result) {
+      //$scope.userLoaded = true;
+    });
+
+    this.deleteUser = function(userId) {
+
+      this.user.$delete({
+        userId: userId
+      }, function(successResult) {
+        // Окей!
+        this.deletionSuccess = true;
+      }, function(errorResult) {
         // Не окей..
-        $scope.notfoundError = true;
-        $scope.userLoaded = true;
-
-
-    });
-
-    $scope.user.$promise.then(function(result) {
-        //$scope.userLoaded = true;
-    });
-
-    $scope.deleteUser = function(userId) {
-
-        $scope.user.$delete({
-            userId: userId
-        }, function(successResult) {
-            // Окей!
-            $scope.deletionSuccess = true;
-        }, function(errorResult) {
-            // Не окей..
-            $scope.deletionError = true;
-        });
+        this.deletionError = true;
+      });
 
     }
 
-});
+  },
+
+  templateUrl: './src/UserDetail/UserDetail.html'
+
+})
